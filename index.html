@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<head>
+    <title>Kolko - Krzyzyk</title>
+    <script src="tic-tac-toe.js"></script>
+<style>
+   h1 {
+    text-align: center;
+    font-size: 55px;
+    color:lightgoldenrodyellow;
+}
+body {
+    background-color: #4ecdf3;
+    margin: 0 auto;
+    
+}
+
+.cell {
+  width:100px;
+  height:100px;
+  border: 2px solid #000;
+  background: #FFFFFF;
+  font-size: 46pt;
+  font-family: arial;
+  font-weight: bold;
+  text-align: center;
+  margin: auto;
+
+}
+
+.cell:hover {
+  background: rgb(201, 201, 201);
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+        <h1>Tic-Tac-Toe</h1>
+        <div id="winner"></div>
+        <div id="content">
+            Wysokosc:<input id="height"  type="number" value="3" min="3" max="100"><br>
+            Szerokosc:<input id="width"  type="number" value="3" min="3" max="100"><br>
+            Marks to Win:<input id="checkrule" type="number" value="3" min="2" max="6"><br>
+            
+            <input id="makeboard" type="button" value="CreateBoard" />
+            <!--<input id="reset" type="button" value="RESET" />-->
+        </div>
+
+</body>
+</html>
