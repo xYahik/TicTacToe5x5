@@ -8,6 +8,8 @@ var Board = /** @class */ (function () {
         var _this = this;
         this.isFirstPlayer = true;
         this.checkrule = 3;
+        this.deathZoneCount = 0;
+        this.playable = false;
         var button = document.getElementById("makeboard");
         button.addEventListener("click", function (e) { return _this.createBoard(); });
     }
@@ -15,27 +17,55 @@ var Board = /** @class */ (function () {
         var width = parseInt(document.getElementById("width").value);
         var height = parseInt(document.getElementById("height").value);
         var checkrule = parseInt(document.getElementById("checkrule").value);
+        var deathZoneCount = parseInt(document.getElementById("deathzone").value);
         this.sizeX = width;
         this.sizeY = height;
         this.checkrule = checkrule;
         this.gameTable = [];
+        this.playable = true;
+        this.deathZoneCount = deathZoneCount;
         for (var i = 0; i < height; i++) {
             this.gameTable[i] = [];
             for (var j = 0; j < width; j++) {
                 this.gameTable[i][j] = 0;
             }
         }
+        for (var i_1 = 0; i_1 < this.deathZoneCount; i_1++) {
+            this.gameTable[this.getRandomInt(0, this.sizeX - 1)][this.getRandomInt(0, this.sizeX - 1)] = -1;
+        }
         document.getElementById("content").innerHTML = '';
         document.getElementById("content").appendChild(this.buildTable(this.gameTable, this.sizeX, this.sizeY));
     };
+    Board.prototype.getRandomInt = function (min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min)) + min;
+    };
+    Board.prototype.CheckTableIsFull = function () {
+        var tmp = true;
+        for (var i = 0; i < this.sizeY; i++) {
+            for (var j = 0; j < this.sizeX; j++) {
+                console.log(i + " " + j + " " + this.gameTable[i][j]);
+                if (this.gameTable[i][j] == 0)
+                    tmp = false;
+            }
+        }
+        return tmp;
+    };
     Board.prototype.CheckWin = function (x, y) {
         var _this = this;
+        var tmp = this.CheckTableIsFull();
+        console.log(tmp);
         if (this.CheckVertical(this.checkrule - 1, x, y, 0) ||
             this.CheckHorizontal(this.checkrule - 1, x, y, 0) ||
             this.CheckCrossLeft(this.checkrule - 1, x, y, 0) ||
-            this.CheckCrossRight(this.checkrule - 1, x, y, 0)) {
+            this.CheckCrossRight(this.checkrule - 1, x, y, 0) || tmp) {
+            this.playable = false;
             var winner = document.createElement("h3");
-            winner.innerHTML = (this.isFirstPlayer) ? "Winner: Player2" : "Winner: Player1";
+            if (tmp)
+                winner.innerHTML = "Remis";
+            else
+                winner.innerHTML = (this.isFirstPlayer) ? "Winner: Player2" : "Winner: Player1";
             document.getElementById("winner").appendChild(winner);
             var resetb = document.createElement("button");
             resetb.innerText = "Reset";
@@ -48,7 +78,7 @@ var Board = /** @class */ (function () {
         this.isFirstPlayer = true;
         document.getElementById("winner").innerHTML = '';
         var content = document.getElementById("content");
-        content.innerHTML = "Wysokosc:<input id=\"height\"  type=\"number\" value=\"3\" min=\"3\" max=\"100\"><br>\n        Szerokosc:<input id=\"width\"  type=\"number\" value=\"3\" min=\"3\" max=\"100\"><br>\n        Marks to Win:<input id=\"checkrule\" type=\"number\" value=\"3\" min=\"2\" max=\"6\"><br>\n        ";
+        content.innerHTML = "Wysokosc:<input id=\"height\"  type=\"number\" value=\"3\" min=\"3\" max=\"100\"><br>\n        Szerokosc:<input id=\"width\"  type=\"number\" value=\"3\" min=\"3\" max=\"100\"><br>\n        Marks to Win:<input id=\"checkrule\" type=\"number\" value=\"3\" min=\"2\" max=\"6\"><br>\n        DeathZones:<input id=\"deathzone\" type=\"number\" value=\"0\" min=\"0\" max=\"10\"> (Remember that game have to be winable)<br>\n            ";
         var button = document.createElement("button");
         button.innerText = "CreateBoard";
         button.id = "makeboard";
@@ -176,22 +206,24 @@ var Board = /** @class */ (function () {
         return this.CheckCrossRight(left - 1, x, y, right + 1);
     };
     Board.prototype.SetCell = function (x, y) {
-        var a = document.getElementById("c" + x + "-" + y);
-        if (this.gameTable[x][y] == 0) {
-            if (this.isFirstPlayer) {
-                this.gameTable[x][y] = 1;
-                a.innerHTML = "X";
-                a.style.color = "red";
-                this.isFirstPlayer = false;
+        if (this.playable) {
+            var a = document.getElementById("c" + x + "-" + y);
+            if (this.gameTable[x][y] == 0) {
+                if (this.isFirstPlayer) {
+                    this.gameTable[x][y] = 1;
+                    a.innerHTML = "X";
+                    a.style.color = "red";
+                    this.isFirstPlayer = false;
+                }
+                else {
+                    this.gameTable[x][y] = 2;
+                    a.innerHTML = "O";
+                    a.style.color = "blue";
+                    this.isFirstPlayer = true;
+                }
             }
-            else {
-                this.gameTable[x][y] = 2;
-                a.innerHTML = "O";
-                a.style.color = "blue";
-                this.isFirstPlayer = true;
-            }
+            this.CheckWin(x, y);
         }
-        this.CheckWin(x, y);
     };
     Board.prototype.buildTable = function (data, width, height) {
         var _this = this;
@@ -202,6 +234,9 @@ var Board = /** @class */ (function () {
             tr = document.createElement("tr");
             var _loop_2 = function (j) {
                 td = document.createElement("td");
+                if (this_1.gameTable[i][j] == -1) {
+                    td.setAttribute("style", "background:black;");
+                }
                 td.className = "cell";
                 td.id = "c" + i + "-" + j;
                 td.addEventListener("click", function (e) { return _this.SetCell(i, j); });
@@ -212,7 +247,7 @@ var Board = /** @class */ (function () {
             }
             tbody.appendChild(tr);
         };
-        var tr, td;
+        var this_1 = this, tr, td;
         for (var i = 0; i < height; i++) {
             _loop_1(i);
         }
