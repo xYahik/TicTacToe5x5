@@ -36,15 +36,18 @@ body {
 <body>
 
         <h1>Tic-Tac-Toe</h1>
+        <div id="timer"></div>
         <div id="winner"></div>
         <div id="content">
             Wysokosc:<input id="height"  type="number" value="3" min="3" max="100"><br>
             Szerokosc:<input id="width"  type="number" value="3" min="3" max="100"><br>
             Marks to Win:<input id="checkrule" type="number" value="3" min="2" max="6"><br>
             DeathZones:<input id="deathzone" type="number" value="0" min="0" max="10"> (Remember that game have to be winable)<br>
+            Time:<input id="time" type="number" value="15" min="5" max="30"> [5-30]<br>
             <input id="makeboard" type="button" value="CreateBoard" />
             <!--<input id="reset" type="button" value="RESET" />-->
         </div>
+        <div id="scores"></div>
 
 </body>
 </html>
